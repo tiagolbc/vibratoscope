@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "VibratoScope: An Open-Source Python Toolkit for Vibrato Analysis in Singing Voice"
+version: "v1.0.0"
+date-released: 2025-04-22
+authors:
+  - family-names: Cruz
+    given-names: Tiago Lima Bicalho
+    orcid: https://orcid.org/0000-0002-8355-5436
+repository-code: https://github.com/tiagolbc/vibratoscope
+license: MIT
+preferred-citation:
+  type: software
+  authors:
+    - family-names: Cruz
+      given-names: Tiago Lima Bicalho
+      orcid: https://orcid.org/0000-0002-8355-5436
+  title: "VibratoScope: An Open-Source Python Toolkit for Vibrato Analysis in Singing Voice"
+  version: "v1.0.0"
+  year: 2025
+  url: https://github.com/tiagolbc/vibratoscope
