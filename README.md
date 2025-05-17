@@ -41,9 +41,3 @@ pip install -r requirements.txt
 3. Run the application:
 
 python VibratoScope.py
-
-## 📄 Citation
-
-If you use this software, please cite:
-
-Tiago Lima Bicalho Cruz. (2025). *VibratoScope: A Python Toolkit for High-Resolution Vibrato Analysis in Singing Voice* (v1.0.1). Journal of Open Source Software. https://doi.org/10.5281/zenodo.15262079
