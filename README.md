@@ -1,8 +1,10 @@
 # VibratoScope
 
-**VibratoScope** is a Python toolkit for the analysis of vibrato in the singing voice. It provides automatic extraction of vibrato rate, extent (in cents), jitter, sample entropy, and generates summary plots. A user-friendly GUI is included for selection of analysis regions and batch processing.
+**VibratoScope** is a Python toolkit for the analysis of vibrato in the singing voice.  
+It provides automatic extraction of vibrato rate, extent (in cents), jitter, sample entropy, and generates summary plots.  
+A user-friendly GUI is included for selection of analysis regions and batch processing.
 
-![screenshot](docs/screenshot.png) <!-- optional -->
+![VibratoScope GUI](figures/gui.png)
 
 ---
 
@@ -10,7 +12,7 @@
 
 - GUI for region selection and interactive spectrograms.
 - Batch processing of multiple WAV files.
-- Extraction of pitch using YIN algorithm (`librosa.pyin`)
+- Extraction of pitch using the YIN algorithm (`librosa.pyin`)
 - Bandpass filtering (3–9 Hz) for vibrato isolation.
 - Calculation of:
   - Vibrato rate (Hz)
@@ -28,6 +30,7 @@
 Requires Python 3.9 or higher.
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/tiagolbc/vibratoscope.git
 cd vibratoscope
