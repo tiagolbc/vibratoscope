@@ -64,7 +64,7 @@ These workflows make VibratoScope versatile for both detailed case studies and l
 
 # Validation and Testing
 
-VibratoScope includes a set of pre-analyzed audio files and outputs in the `examples/` directory. These synthetic test cases contain singing vowel sounds with known vibrato parameters (e.g., 6.0 Hz rate, 0.5 semitone extent) and are used to validate the vibrato detection algorithms.
+VibratoScope includes a set of pre-analyzed audio files and outputs in the `examples/` directory. These synthetic test cases contain singing vowel sounds with known vibrato parameters (e.g., 5.0 Hz rate, 0.3 semitone extent) and are used to validate the vibrato detection algorithms.
 
 Each example provides:
 - A `.wav` file with controlled vibrato features
@@ -73,9 +73,9 @@ Each example provides:
 
 These test cases confirm that VibratoScope reliably measures vibrato parameters across known input conditions, validating its use for both research and pedagogical applications.
 
-Figure \autoref{fig:test_example} illustrates the analysis of a synthetic vowel with 6.0 Hz vibrato rate and 0.5 semitone extent, showing accurate pitch detection, vibrato cycle extraction, and summary visualization.
+Figure \autoref{fig:test_example} illustrates the analysis of a synthetic vowel with 5.0 Hz vibrato rate and 0.3 semitone extent, showing accurate pitch detection, vibrato cycle extraction, and summary visualization.
 
-![Example output of synthetic vowel test](../examples/vowel_a_C4_6.0_0.5_1.1_015_final_analysis.png){#fig:test_example width=90%}
+![Example output of synthetic vowel test](../examples/vowel%20i%20C5_5.0_0.3_0_0_987_final_analysis.png)
 
 # Statement of Need
 
