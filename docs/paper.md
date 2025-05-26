@@ -109,7 +109,7 @@ where ( m ) is the pattern length, ( r ) is the tolerance, ( N ) is the number o
 
 ![Peak and Trough Detection](../figures/peak_trough_detection.png){#fig:peak_trough_detection width=90%}
 
-![Final Analysis Summary](../figures/Final_Analysis.png){#fig:final_analysis width=90%}
+![Final Analysis Summary](../figures/Final_Analysis_Vibrato.png){#fig:final_analysis width=90%}
 
 # Citations
 
