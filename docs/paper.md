@@ -88,13 +88,13 @@ where ( m ) is the pattern length, ( r ) is the tolerance, ( N ) is the number o
 
 # Figures
 
-![Graphical User Interface](figures/gui.png){#fig:gui width=90%}
+![Graphical User Interface](../figures/gui.png){#fig:gui width=90%}
 
-![Pitch Filtering](figures/pitch_filtering.png){#fig:pitch_filtering width=90%}
+![Pitch Filtering](../figures/pitch_filtering.png){#fig:pitch_filtering width=90%}
 
-![Peak and Trough Detection](figures/peak_trough_detection.png){#fig:peak_trough_detection width=90%}
+![Peak and Trough Detection](../figures/peak_trough_detection.png){#fig:peak_trough_detection width=90%}
 
-![Final Analysis Summary](figures/final_analysis.png){#fig:final_analysis width=90%}
+![Final Analysis Summary](../figures/final_analysis.png){#fig:final_analysis width=90%}
 
 # Citations
 
