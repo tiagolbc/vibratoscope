@@ -62,6 +62,21 @@ VibratoScope supports both interactive and automated workflows:
 
 These workflows make VibratoScope versatile for both detailed case studies and large-scale dataset analysis.
 
+# Validation and Testing
+
+VibratoScope includes a set of pre-analyzed audio files and outputs in the `examples/` directory. These synthetic test cases contain singing vowel sounds with known vibrato parameters (e.g., 6.0 Hz rate, 0.5 semitone extent) and are used to validate the vibrato detection algorithms.
+
+Each example provides:
+- A `.wav` file with controlled vibrato features
+- Output figures including pitch traces, cycle-by-cycle plots, entropy, and summary analysis
+- Corresponding CSV files with extracted metrics
+
+These test cases confirm that VibratoScope reliably measures vibrato parameters across known input conditions, validating its use for both research and pedagogical applications.
+
+Figure \autoref{fig:test_example} illustrates the analysis of a synthetic vowel with 6.0 Hz vibrato rate and 0.5 semitone extent, showing accurate pitch detection, vibrato cycle extraction, and summary visualization.
+
+![Example output of synthetic vowel test](../examples/vowel_a_C4_6.0_0.5_1.1_015_final_analysis.png){#fig:test_example width=90%}
+
 # Statement of Need
 
 Vibrato is a cornerstone of vocal expression, yet its quantitative analysis is often constrained by the limitations of existing tools. Proprietary software like VoceVista Pro provides real-time vibrato overlays on spectrograms but is hindered by opaque algorithms, limited export options, and commercial licensing costs, reducing transparency and reproducibility [@vocevista:2022]. BioVoice offers high-resolution estimates of vibrato rate, extent, jitter, and shimmer, but its Windows-only executable lacks batch processing and an API, limiting integration with automated pipelines [@morelli:2019]. Open-source alternatives, such as the Embodied Music Lab (EML) Praat script, are cross-platform and freely available but require manual configuration and execution within Praat’s scripting console, posing barriers for users without coding expertise [@howell:2024]. The Vibrato Analysis Toolbox (VAT) provides a sophisticated Hilbert-transform pipeline with user-definable filters, yet its reliance on MATLAB ties it to costly licenses and demands signal-processing expertise, restricting its accessibility [@zhang:2017].
