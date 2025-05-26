@@ -78,7 +78,7 @@ These examples are used in validation and reproducibility. See `docs/paper.md` f
 If you use this toolkit in research, please cite:
 
 **Cruz, T. L. B. (2025). VibratoScope: A Python Toolkit for High-Resolution Vibrato Analysis in Singing Voice.**  
-*Zenodo.* https://doi.org/10.5281/zenodo.15262079
+*Zenodo.* https://doi.org/10.5281/zenodo.15519845
 
 Or use the “Cite this repository” button on GitHub for BibTeX.
 
