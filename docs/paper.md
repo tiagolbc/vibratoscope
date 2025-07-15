@@ -117,6 +117,6 @@ Citations are formatted using rMarkdown and linked to entries in paper.bib. For 
 
 # Acknowledgements
 
-VibratoScope was developed as part of doctoral research at the Federal University of Minas Gerais (UFMG), with funding from [Funding Agency, if applicable]. I acknowledge contributions from collaborators in voice science and music technology, as well as feedback from reviewers at the Pan-European Voice Conference and The Voice Foundation.
+VibratoScope was developed as part of doctoral research at the Federal University of Minas Gerais (UFMG).
 
 # References
