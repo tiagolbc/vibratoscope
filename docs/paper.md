@@ -22,13 +22,13 @@ bibliography: paper.bib
 
 # Summary
 
-Vocal vibrato is a defining feature of trained singing, particularly in Western classical music, where it is described as a periodic fluctuation in the fundamental frequency (f₀), often accompanied by coordinated variations in loudness and timbre. Foundational definitions by Seashore \[@seashore1932\] and Sundberg \[@sundberg1994\] characterize good vibrato as a pulsation that enhances tonal richness and expressiveness.
+Vocal vibrato is a defining feature of trained singing, particularly in Western classical music, where it is described as a periodic fluctuation in the fundamental frequency (f₀), often accompanied by coordinated variations in loudness and timbre. Foundational definitions \[@seashore1932\] and \[@sundberg1994\] characterize good vibrato as a pulsation that enhances tonal richness and expressiveness.
 
 Its acoustic analysis typically includes parameters such as vibrato rate (Hz), extent (cents or semitones), and regularity. The latter is often assessed via jitter and shimmer, representing cycle-to-cycle variations in frequency and amplitude, respectively. More advanced descriptors like sample entropy, determinism, and line length have been used to quantify vibrato complexity and stability \[@manfredi2015; @acosta2023\].
 
-Manfredi et al. \[@manfredi2015\] proposed a high-resolution method using the BioVoice software, referencing extent norms reported by Ferrante \[@ferrante2011\] and Anand et al. \[@anand2012\]. Capobianco et al. \[@capobianco2023\] highlighted stylistic differences, showing that Early Music singing features faster, narrower, and less regular vibrato compared to Romantic style. Variability across genres and historical contexts has also been observed in jazz \[@manfredi2015\], operetta and schlager \[@nestorova2023\], and contemporary commercial music (CCM) \[@hakanpaa2021\].
+\[@manfredi2015\] proposed a high-resolution method using the BioVoice software, referencing extent norms reported. \[@ferrante2011; @anand2012; @capobianco2023\] highlighted stylistic differences, showing that Early Music singing features faster, narrower, and less regular vibrato compared to Romantic style. Variability across genres and historical contexts has also been observed in jazz \[@manfredi2015\], operetta and schlager \[@nestorova2023\], and contemporary commercial music (CCM) \[@hakanpaa2021\].
 
-Additionally, Glasner and Johnson \[@glasner2022\] noted that historical recording technology may have influenced vibrato perception and performance in modern opera singers. These findings reinforce the view of vibrato as a stylistically dependent and context-sensitive vocal parameter.
+Additionally, \[@glasner2022\] noted that historical recording technology may have influenced vibrato perception and performance in modern opera singers. These findings reinforce the view of vibrato as a stylistically dependent and context-sensitive vocal parameter.
 
 
 # Installation
