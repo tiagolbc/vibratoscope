@@ -4,4 +4,10 @@ librosa
 matplotlib
 pandas
 sounddevice
-tk
+soundfile
+praat-parselmouth
+pyreaper
+Pillow
+psutil
+pyaudio
+setuptools<81
