@@ -5,9 +5,15 @@ import numpy as np
 import pandas as pd
 import librosa
 import parselmouth
-import pyreaper
 from scipy import fft
 from sfeeds import extract_pitch_sfeeds as extract_pitch_with_sfeeds
+
+try:
+    import pyreaper
+    PYREAPER_AVAILABLE = True
+except ImportError:
+    pyreaper = None
+    PYREAPER_AVAILABLE = False
 
 
 ########################################
@@ -17,6 +23,7 @@ from sfeeds import extract_pitch_sfeeds as extract_pitch_with_sfeeds
 def load_audio(file_path, sr=22050):
     y, sr = librosa.load(file_path, sr=sr, mono=True)
     return y, sr
+
 
 ########################################
 # PITCH EXTRACTION FUNCTIONS
@@ -52,7 +59,6 @@ def extract_pitch_with_yin(audio_data, sr, fmin=50.0, fmax=1500.0, file_path=Non
     f0, _, _ = librosa.pyin(audio_data, sr=sr, fmin=fmin, fmax=fmax)
     times = librosa.times_like(f0, sr=sr)
 
-    # Save TXT if file_path provided
     if file_path is not None:
         out_txt = os.path.splitext(file_path)[0] + "_pitch_yin.txt"
         df = pd.DataFrame({
@@ -83,7 +89,7 @@ def extract_pitch_with_hps(audio_data, sr, file_path, fmin=50.0, fmax=1500.0, fr
         window = np.hanning(frame_samples)
         frame_windowed = frame * window
 
-        N = frame_samples * 4  # Zero-padding
+        N = frame_samples * 4
         spectrum = np.abs(fft.fft(frame_windowed, N))
         freqs = fft.fftfreq(N, 1 / sr)[:N // 2]
         spectrum = spectrum[:N // 2]
@@ -124,7 +130,16 @@ def extract_pitch_with_hps(audio_data, sr, file_path, fmin=50.0, fmax=1500.0, fr
 def extract_pitch_with_reaper(audio_data, sr, fmin=50.0, fmax=1500.0, file_path=None):
     """
     Extract pitch using REAPER (pyreaper wrapper).
+
+    This method is optional. If pyreaper is not installed, a clear error is raised
+    only when the REAPER method is explicitly requested.
     """
+    if not PYREAPER_AVAILABLE:
+        raise ImportError(
+            "REAPER support is optional and requires pyreaper. "
+            "Install pyreaper to use the REAPER pitch extraction method."
+        )
+
     try:
         if not isinstance(audio_data, np.ndarray) or audio_data.size == 0:
             raise ValueError("Invalid audio data.")
@@ -132,6 +147,7 @@ def extract_pitch_with_reaper(audio_data, sr, fmin=50.0, fmax=1500.0, file_path=
         max_abs = np.max(np.abs(audio_data))
         if max_abs == 0:
             raise ValueError("Audio data is silent")
+
         audio_data_int16 = np.int16(audio_data / max_abs * 32767)
 
         reaper_output = pyreaper.reaper(audio_data_int16, sr, minf0=fmin, maxf0=fmax)
@@ -179,14 +195,18 @@ def extract_harmonic_pitch(y, sr, f0_est=None):
     valid = freqs >= 50
     if not np.any(valid):
         return None, None, None
+
     freqs_valid = freqs[valid]
     avg_amp = np.mean(D[valid, :], axis=1)
     idx_max = np.argmax(avg_amp)
     dominant_freq = freqs_valid[idx_max]
+
     if f0_est is None:
         f0_est = dominant_freq / 2
+
     harmonic_num = max(1, int(round(dominant_freq / f0_est)))
     t_frames = librosa.frames_to_time(np.arange(D.shape[1]), sr=sr, hop_length=hop_length)
+
     harmonic_contour = []
     expected_freq = harmonic_num * f0_est
     for i in range(D.shape[1]):
@@ -198,5 +218,6 @@ def extract_harmonic_pitch(y, sr, f0_est=None):
         local_idx = np.argmax(local_amp)
         freq_est = freqs[start_bin + local_idx]
         harmonic_contour.append(freq_est)
+
     harmonic_contour = np.array(harmonic_contour)
     return t_frames, harmonic_contour, harmonic_num
