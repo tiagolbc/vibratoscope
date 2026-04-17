@@ -45,6 +45,13 @@ cd vibratoscope
 pip install -r requirements.txt
 ```
 
+Some features also depend on system-level components:
+
+- **tkinter** for the GUI
+- **PortAudio** for `pyaudio`
+- audio backends required by `sounddevice`
+
+If `pyaudio` fails to install, make sure PortAudio is available on your system.
 ---
 
 ## 🚀 Running VibratoScope
