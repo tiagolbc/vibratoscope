@@ -22,7 +22,7 @@ bibliography: paper.bib
 
 # Summary
 
-Vocal vibrato is a defining feature of trained singing, particularly in Western classical music, where it is described as a periodic fluctuation in the fundamental frequency ($f0$), often accompanied by coordinated variations in loudness and timbre. Foundational definitions [@seashore1932; @sundberg1994] characterize good vibrato as a pulsation that enhances tonal richness and expressiveness.
+Vocal vibrato is a defining feature of trained singing, particularly in Western classical music, where it is described as a periodic fluctuation in the fundamental frequency ($fo$), often accompanied by coordinated variations in loudness and timbre. Foundational definitions [@seashore1932; @sundberg1994] characterize good vibrato as a pulsation that enhances tonal richness and expressiveness.
 
 Its acoustic analysis typically includes parameters such as vibrato rate (Hz), extent (cents or semitones), and regularity. In this context, jitter refers to cycle-to-cycle variation in vibrato period, shimmer refers to cycle-to-cycle variation in vibrato amplitude, and sample entropy is used as a measure of temporal irregularity. More advanced descriptors such as determinism and line length have also been used to quantify vibrato stability and complexity [@manfredi2015; @acosta2023].
 
