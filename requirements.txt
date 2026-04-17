@@ -11,3 +11,4 @@ Pillow
 psutil
 pyaudio
 setuptools<81
+pytest
