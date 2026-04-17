@@ -51,8 +51,8 @@ Some features also depend on system-level components:
 - **PortAudio** for `pyaudio`
 - audio backends required by `sounddevice`
 
-If `pyaudio` fails to install, make sure PortAudio is available on your system.
-REAPER support is optional. The main installation does not require `pyreaper`, but users who want to use the REAPER pitch extraction method must install `pyreaper` separately.
+- If `pyaudio` fails to install, make sure PortAudio is available on your system.
+- REAPER support is optional. The main installation does not require `pyreaper`, but users who want to use the REAPER pitch extraction method must install `pyreaper` separately.
 ---
 
 ## 🚀 Running VibratoScope
