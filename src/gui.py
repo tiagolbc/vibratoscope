@@ -17,7 +17,6 @@ from matplotlib.widgets import SpanSelector
 from pitch import extract_pitch_with_yin, extract_pitch_with_praat, extract_pitch_with_hps, extract_pitch_with_reaper
 
 import sounddevice as sd
-import pyreaper
 import shutil
 
 # Import from your own modules (without dot!)
@@ -890,8 +889,12 @@ class VibratoGUI:
         # ==== END NEW ====
 
         # Plot peaks and troughs (filtered signal, global, Figure_2)
-        save_path_global = os.path.join(save_dir,
-                                        f"{os.path.splitext(os.path.basename(self.file_path))[0]}_Figure_2_global.png")
+        base_name = os.path.splitext(os.path.basename(self.file_path))[0]
+
+        save_path_global = os.path.join(
+            save_dir,
+            f"{base_name}_peak_trough_detection_global.png"
+        )
         fig_p = plot_peaks_troughs(t_valid, cents_filtered, peaks, troughs, save_path=save_path_global)
         if fig_p:
             self.generated_figures.append(fig_p)
@@ -899,7 +902,7 @@ class VibratoGUI:
             print("Warning: Failed to generate global Figure_2 plot.")
 
         # Figure 1: Global analysis (using original plot_before_after_filter)
-        save_path_fig1 = os.path.join(save_dir, "Figure_1.png")
+        save_path_fig1 = os.path.join(save_dir, f"{base_name}_pitch_filtering.png")
         fig1 = plot_before_after_filter(self.t_uniform, self.cents_uniform, cents_filtered, save_path=save_path_fig1)
         self.generated_figures.append(fig1)
 
@@ -916,8 +919,10 @@ class VibratoGUI:
                 t_region, cents_region, cents_filtered_region, prominence=5, distance=5
             )
             # Plot peaks and troughs (filtered signal, region-specific, Figure_2)
-            save_path_region = os.path.join(save_dir,
-                                            f"{os.path.splitext(os.path.basename(self.file_path))[0]}_Figure_2_region_{reg_idx + 1}.png")
+            save_path_region = os.path.join(
+                save_dir,
+                f"{base_name}_peak_trough_detection_region_{reg_idx + 1}.png"
+            )
             fig_p = plot_peaks_troughs(t_valid, cents_filtered_region, peaks, troughs, save_path=save_path_region)
             if fig_p:
                 self.generated_figures.append(fig_p)
@@ -1063,13 +1068,26 @@ class VibratoGUI:
                         'File_Name': os.path.basename(self.file_path)
                     }
                     alt_region_list.append(alt_region_item)
-                    fig_alt = plot_before_after_filter(t_region_alt, c_region_alt, c_filtered_alt,
-                                                       save_path=os.path.join(save_dir,
-                                                                              f"Figure_1_alt_region_{reg_idx + 1}.png"))
+                    fig_alt = plot_before_after_filter(
+                        t_region_alt,
+                        c_region_alt,
+                        c_filtered_alt,
+                        save_path=os.path.join(
+                            save_dir,
+                            f"{base_name}_pitch_filtering_alt_region_{reg_idx + 1}.png"
+                        )
+                    )
                     self.generated_figures.append(fig_alt)
-                    fig2_alt = plot_peaks_troughs(t_valid, c_filtered_alt, peaks, troughs,
-                                                  save_path=os.path.join(save_dir,
-                                                                         f"Figure_2_alt_region_{reg_idx + 1}.png"))
+                    fig2_alt = plot_peaks_troughs(
+                        t_valid,
+                        c_filtered_alt,
+                        peaks,
+                        troughs,
+                        save_path=os.path.join(
+                            save_dir,
+                            f"{base_name}_peak_trough_detection_alt_region_{reg_idx + 1}.png"
+                        )
+                    )
                     self.generated_figures.append(fig2_alt)
 
                 if not alt_cycle_params:
@@ -1202,7 +1220,11 @@ class VibratoGUI:
         for reg_item in region_list:
             reg_item.update(self.summary_data)
 
-        fig3 = plot_vibrato_rate(df_detailed, df_smoothed, save_path=os.path.join(save_dir, "Figure_3.png"))
+        fig3 = plot_vibrato_rate(
+            df_detailed,
+            df_smoothed,
+            save_path=os.path.join(save_dir, f"{base_name}_vibrato_rate.png")
+        )
         self.generated_figures.append(fig3)
 
         print(f"[FINAL SampEn] SampEn Rate: {sampen_rate}, Extent: {sampen_extent}, Cycle Time: {sampen_cycle_time}")
@@ -1222,7 +1244,7 @@ class VibratoGUI:
             show_figure=False
         )
 
-        fig_summary_path = os.path.join(save_dir, "final_analysis.png")
+        fig_summary_path = os.path.join(save_dir, f"{base_name}_final_analysis.png")
         fig_summary.savefig(fig_summary_path, dpi=300)
         plt.close(fig_summary)
         self.generated_figures.append(fig_summary_path)
@@ -1366,8 +1388,12 @@ class VibratoGUI:
                 )
 
                 # Plot global Figure_2 (peaks and troughs)
-                save_path_global = os.path.join(save_dir,
-                                                f"{os.path.splitext(os.path.basename(file_path))[0]}_Figure_2_global.png")
+                base_name = os.path.splitext(os.path.basename(file_path))[0]
+
+                save_path_global = os.path.join(
+                    save_dir,
+                    f"{base_name}_peak_trough_detection_global.png"
+                )
                 fig_p = plot_peaks_troughs(t_valid, cents_filtered, peaks, troughs, save_path=save_path_global)
                 if fig_p:
                     self.generated_figures.append(fig_p)
@@ -1375,8 +1401,10 @@ class VibratoGUI:
                     print(f"Batch: Warning: Failed to generate global Figure_2 for {os.path.basename(file_path)}")
 
                 # Plot Figure_1 (before and after filter)
-                save_path_fig1 = os.path.join(save_dir,
-                                              f"{os.path.splitext(os.path.basename(file_path))[0]}_Figure_1.png")
+                save_path_fig1 = os.path.join(
+                    save_dir,
+                    f"{base_name}_pitch_filtering.png"
+                )
                 fig1 = plot_before_after_filter(self.t_uniform, self.cents_uniform, cents_filtered,
                                                 save_path=save_path_fig1)
                 self.generated_figures.append(fig1)
@@ -1408,8 +1436,10 @@ class VibratoGUI:
                     )
 
                     # Plot region-specific Figure_2
-                    save_path_region = os.path.join(save_dir,
-                                                    f"{os.path.splitext(os.path.basename(file_path))[0]}_Figure_2_region_{reg_idx + 1}.png")
+                    save_path_region = os.path.join(
+                        save_dir,
+                        f"{base_name}_peak_trough_detection_region_{reg_idx + 1}.png"
+                    )
                     fig_p = plot_peaks_troughs(t_valid, cents_filtered_region, peaks, troughs,
                                                save_path=save_path_region)
                     if fig_p:
@@ -1619,13 +1649,26 @@ class VibratoGUI:
                         alt_region_list.append(alt_region_item)
 
                         # Plot alternative figures
-                        fig_alt = plot_before_after_filter(t_region_alt, c_region_alt, c_filtered_alt,
-                                                           save_path=os.path.join(save_dir,
-                                                                                  f"{os.path.splitext(os.path.basename(file_path))[0]}_Figure_1_alt_region_{reg_idx + 1}.png"))
+                        fig_alt = plot_before_after_filter(
+                            t_region_alt,
+                            c_region_alt,
+                            c_filtered_alt,
+                            save_path=os.path.join(
+                                save_dir,
+                                f"{base_name}_pitch_filtering_alt_region_{reg_idx + 1}.png"
+                            )
+                        )
                         self.generated_figures.append(fig_alt)
-                        fig2_alt = plot_peaks_troughs(t_valid, c_filtered_alt, peaks, troughs,
-                                                      save_path=os.path.join(save_dir,
-                                                                             f"{os.path.splitext(os.path.basename(file_path))[0]}_Figure_2_alt_region_{reg_idx + 1}.png"))
+                        fig2_alt = plot_peaks_troughs(
+                            t_valid,
+                            c_filtered_alt,
+                            peaks,
+                            troughs,
+                            save_path=os.path.join(
+                                save_dir,
+                                f"{base_name}_peak_trough_detection_alt_region_{reg_idx + 1}.png"
+                            )
+                        )
                         self.generated_figures.append(fig2_alt)
 
                     if not alt_cycle_params:
@@ -1771,14 +1814,18 @@ class VibratoGUI:
                     reg_item.update(summary_data_file)
 
                 # Plot Figure_3 (vibrato rate)
-                save_path_fig3 = os.path.join(save_dir,
-                                              f"{os.path.splitext(os.path.basename(file_path))[0]}_Figure_3.png")
+                save_path_fig3 = os.path.join(
+                    save_dir,
+                    f"{base_name}_vibrato_rate.png"
+                )
                 fig_r = plot_vibrato_rate(df_detailed, df_smoothed, save_path=save_path_fig3)
                 self.generated_figures.append(fig_r)
 
                 # Plot final analysis summary
-                save_path_sum = os.path.join(save_dir,
-                                             f"{os.path.splitext(os.path.basename(file_path))[0]}_final_analysis.png")
+                save_path_sum = os.path.join(
+                    save_dir,
+                    f"{base_name}_final_analysis.png"
+                )
                 print(
                     f"[FINAL SampEn] {os.path.basename(file_path)} | SampEn Rate = {sampen_rate:.6f}, Extent = {sampen_extent:.6f}, Cycle Time = {sampen_cycle_time:.6f}")
                 fig_summary = final_plot(
@@ -1851,7 +1898,7 @@ class VibratoGUI:
                     except shutil.SameFileError:
                         pass
             else:
-                fig_path = os.path.join(save_dir, f"figure_{idx}.png")
+                fig_path = os.path.join(save_dir, f"generated_plot_{idx + 1}.png")
                 fig_item.savefig(fig_path, dpi=300)
                 plt.close(fig_item)
 
