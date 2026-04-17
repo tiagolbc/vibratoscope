@@ -49,21 +49,21 @@ Some features also depend on system-level components, including `tkinter` for th
 
 # Example Use
 
-VibratoScope supports both interactive and automated workflows:
+VibratoScope supports interactive analysis and GUI-based batch processing:
 
 **Interactive Analysis:**
 
-- Launch the GUI by running `python vibratoscope.py`.
+- Launch the GUI by running `python run.py`.
 - Load a .wav file and select a region of interest using the GUI's time-domain viewer.
 - Click "Run Analysis" to compute vibrato metrics, which are displayed as plots and saved as CSV/PNG files.
 
 **Batch Processing:**
 
-- Select multiple .wav files via the GUI or command-line interface.
-- Run the analysis without manual region selection, using default or user-specified parameters.
+- Select multiple `.wav` files through the GUI batch-processing workflow.
+- Run the analysis through the GUI batch-processing workflow, using the selected analysis settings.
 - Results are organized in structured folders, with each file generating corresponding CSV and PNG outputs.
 
-These workflows make VibratoScope versatile for both detailed case studies and large-scale dataset analysis.
+These workflows make VibratoScope suitable for both detailed case studies and larger collections of recordings.
 
 # Validation and Testing
 
