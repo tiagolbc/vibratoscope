@@ -161,7 +161,7 @@ def plot_spectrogram(ax, audio_data, sr, times, pitch_hz,
     ax.set_title(f"{spectrogram_type.replace('_', ' ').title()} Spectrogram & F0 ({pitch_method.upper()})")
 
 
-def plot_before_after_filter(t_uniform, cents_uniform, cents_filtered, save_path="Figure_1.png"):
+def plot_before_after_filter(t_uniform, cents_uniform, cents_filtered, save_path="pitch_filtering.png"):
     """
     Plots the centered pitch and filtered pitch for comparison.
     """
@@ -181,7 +181,7 @@ def plot_before_after_filter(t_uniform, cents_uniform, cents_filtered, save_path
     return save_path
 
 
-def plot_peaks_troughs(t_valid, cents_filtered, peaks, troughs, save_path="Figure_2.png"):
+def plot_peaks_troughs(t_valid, cents_filtered, peaks, troughs, save_path="peak_trough_detection.png"):
     """
     Plots the filtered signal with detected peaks and troughs.
     """
@@ -199,7 +199,7 @@ def plot_peaks_troughs(t_valid, cents_filtered, peaks, troughs, save_path="Figur
     return save_path
 
 
-def plot_vibrato_rate(df, df_smoothed, save_path="Figure_3.png"):
+def plot_vibrato_rate(df, df_smoothed, save_path="vibrato_rate.png"):
     """
     Plots the vibrato rate per half cycle.
     """
@@ -389,7 +389,7 @@ def final_plot(df, df_smoothed, summary_data, jitter_metrics, cv_rate, cv_extent
                       bbox=dict(boxstyle="round,pad=0.3", facecolor="white", edgecolor="black"))
 
     fig.canvas.draw()
-    fig.savefig("Figure_Analysis_Vibrato.png", dpi=300)
+    fig.savefig("final_analysis_summary.png", dpi=300)
     if show_figure:
         plt.show()
     else:
