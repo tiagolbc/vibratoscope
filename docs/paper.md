@@ -30,9 +30,9 @@ Its acoustic analysis typically includes parameters such as vibrato rate (Hz), e
 
 # Statement of Need
 
-Vibrato is a cornerstone of vocal expression, yet its quantitative analysis is often constrained by the limitations of existing tools. Proprietary software like VoceVista Pro provides real-time vibrato overlays on spectrograms but is hindered by opaque algorithms, limited export options, and commercial licensing costs, reducing transparency and reproducibility [@vocevista2022]. BioVoice offers high-resolution estimates of vibrato rate, extent, jitter, and shimmer, but its Windows-only executable lacks batch processing and an API, limiting integration with automated pipelines [@morelli2019]. Open-source alternatives, such as the Embodied Music Lab (EML) Vibrato Tools [@howell2025], are cross-platform Praat plugins that provide a user-friendly graphical interface and do not require coding skills or manual scripting. These tools offer default configurations that work for most cases. While the need to install Praat and the plugin may represent an additional step, the EML tools are highly accessible and well-documented. The Vibrato Analysis Toolbox (VAT) provides a sophisticated Hilbert-transform pipeline with user-definable filters, yet its reliance on MATLAB ties it to costly licenses and demands signal-processing expertise, restricting its accessibility [@zhang2017].
+Vibrato is a cornerstone of vocal expression, yet its quantitative analysis is often constrained by the limitations of existing tools. Proprietary software like VoceVista Pro provides real-time vibrato overlays on spectrograms but is hindered by opaque algorithms, limited export options, and commercial licensing costs, reducing transparency and reproducibility [@vocevista2022]. BioVoice offers high-resolution estimates of vibrato rate, extent, jitter, and shimmer, but its Windows-only executable lacks batch processing and an API, limiting integration with automated pipelines [@morelli2019]. Open-source alternatives, such as the Embodied Music Lab (EML) Vibrato Tools [@howell2025], are cross-platform Praat plugins that provide a user-friendly graphical interface and do not require coding skills or manual scripting. These tools are highly accessible and well documented, but their workflow remains centered on interactive Praat-based use rather than standalone GUI-based batch processing across multiple files. The Vibrato Analysis Toolbox (VAT) provides a sophisticated Hilbert-transform pipeline with user-definable filters, yet its reliance on MATLAB ties it to costly licenses and demands signal-processing expertise, restricting its accessibility [@zhang2017].
 
-VibratoScope was designed to address these gaps by providing a standalone Python-based environment for vibrato analysis with interactive visualization and GUI-based batch processing. Implemented in Python and released under an MIT license, it supports multiple pitch extraction methods, including Praat [@boersma1993], YIN [@decheveigne2002], Harmonic Product Spectrum [@noll1970], REAPER [@talkin2015], and SFEEDS [@kitayama2024], an experimental spectral $fo$ estimation method adapted from a Praat-based workflow. It also provides transparent CSV and PNG outputs that can be used in downstream statistical workflows. In this way, VibratoScope complements existing tools by combining a standalone graphical interface, multiple $fo$ estimators, and exportable outputs for vibrato-focused analysis.
+VibratoScope was designed to address these gaps by providing a standalone Python-based environment for vibrato analysis with interactive visualization and GUI-based batch processing. Implemented in Python and released under an MIT license, it supports multiple pitch extraction methods, including Praat [@boersma1993], YIN [@decheveigne2002], Harmonic Product Spectrum [@noll1970], REAPER [@talkin2015], and SFEEDS [@kitayama2024], an experimental spectral $f_o$ estimation method adapted from a Praat-based workflow. It also provides transparent CSV and PNG outputs that can be used in downstream statistical workflows. Recent DNN-based pitch estimators are not included in the current release; the present version prioritizes established, interpretable methods already used in voice and singing research. In this way, VibratoScope complements existing tools by combining a standalone graphical interface, multiple $f_o$ estimators, and exportable outputs for vibrato-focused analysis.
 
 # Installation
 
@@ -45,7 +45,7 @@ pip install -r requirements.txt
 python run.py
 ```
 
-Some features also depend on system-level components, including `tkinter` for the GUI and PortAudio for `pyaudio`.
+The current implementation also depends on system-level components, including `tkinter` for the GUI and PortAudio for `pyaudio`.
 
 # Example Use
 
@@ -80,21 +80,29 @@ The example below illustrates the analysis of a synthetic vowel with 5.0 Hz vibr
 
 # Implemented Metrics
 
-VibratoScope models vibrato as a periodic modulation of the fundamental frequency $f_0(t)$. Vibrato extent (in cents) is calculated as:
+VibratoScope models vibrato as a periodic modulation of the fundamental frequency $f_o(t)$. Vibrato extent, expressed in cents relative to the mean contour, is calculated as:
 
 $$
-\text{Extent} = 1200 \cdot \log_2\left(\frac{f_0(t)}{f_{\text{mean}}}\right)
+\mathrm{Extent}(t) = 1200 \cdot \log_2\left(\frac{f_o(t)}{\bar{f_o}}\right)
 $$
 
-where ( f_0(t) ) is the instantaneous fundamental frequency, and ( f_{\text{mean}} ) is the mean frequency over the analyzed segment. 
+where $f_o(t)$ is the instantaneous fundamental frequency and $\bar{f_o}$ is the mean fundamental frequency over the analyzed segment.
 
-Vibrato rate is derived from the duration of consecutive half-cycles detected from peaks and troughs in the bandpass-filtered contour. Jitter is computed from cycle-to-cycle variation in half-cycle duration, and shimmer from cycle-to-cycle variation in oscillation amplitude. Sample entropy ($\text{SampEn}$) is used to describe irregularity in the temporal sequence of vibrato parameters and is defined as
+Vibrato rate is derived from the duration of consecutive half-cycles detected from peaks and troughs in the bandpass-filtered contour. If $\Delta t_i$ is the duration of the $i$th half-cycle, then the corresponding cycle-based vibrato rate is:
 
 $$
-\text{SampEn}(m, r, N) = -\ln\left(\frac{A}{B}\right)
+r_i = \frac{1}{2\Delta t_i}
 $$
 
-where $m$ is the pattern length, $r$ is the tolerance, $N$ is the number of data points, and $A$ and $B$ are counts of matching patterns in the time series. Determinism and line length, when used, are recurrence-based descriptors of temporal structure.
+Jitter is computed from cycle-to-cycle variation in half-cycle duration. The coefficient of variation (CV) is calculated for both vibrato rate and extent as the standard deviation divided by the mean, expressed as a percentage. VibratoScope also provides smoothed summaries based on rolling averages across consecutive cycles.
+
+Sample entropy ($\mathrm{SampEn}$) is used to describe irregularity in the temporal sequence of vibrato parameters and is defined as:
+
+$$
+\mathrm{SampEn}(m, r, N) = -\ln\left(\frac{A}{B}\right)
+$$
+
+where $m$ is the pattern length, $r$ is the tolerance, $N$ is the number of data points, and $A$ and $B$ are counts of matching patterns in the time series.
 
 # Figures
 
