@@ -8,6 +8,5 @@ soundfile
 praat-parselmouth
 Pillow
 psutil
-pyaudio
 setuptools<81
 pytest
