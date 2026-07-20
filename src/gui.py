@@ -605,7 +605,7 @@ class VibratoGUI:
             except Exception as e2:
                 print(f"YIN failed: {e2}. Falling back to HPS.")
                 self.actual_pitch_method.set("hps")
-                f0, times = extract_pitch_with_hps(y, sr, wav_path, fmin=fmin, fmax=fmax)  # Pass wav_path
+                times, f0 = extract_pitch_with_hps(y, sr, wav_path, fmin=fmin, fmax=fmax)  # Pass wav_path
                 print("Pitch extracted with HPS successfully.")
                 messagebox.showinfo("Pitch Extraction", "Pitch extracted with HPS successfully.")
                 return times, f0
@@ -1013,7 +1013,7 @@ class VibratoGUI:
                 self.harmonic_frequency = np.nanmedian(harmonic_pitch)
                 cents_h = convert_to_cents(harmonic_pitch)
                 cents_h_centered = remove_mean_or_median(cents_h, use_median=True)
-                cents_adjusted = cents_h_centered / harmonic_num
+                cents_adjusted = cents_h_centered
                 new_t_uniform, new_cents_uniform = resample_to_uniform_time(t_h, cents_adjusted, new_sr=100)
                 if new_t_uniform is None:
                     messagebox.showerror("Error", "Not enough valid points for resampling in alternative method.")
@@ -1551,7 +1551,7 @@ class VibratoGUI:
                     self.harmonic_frequency = np.nanmedian(harmonic_pitch)
                     cents_h = convert_to_cents(harmonic_pitch)
                     cents_h_centered = remove_mean_or_median(cents_h, use_median=True)
-                    cents_adjusted = cents_h_centered / harmonic_num
+                    cents_adjusted = cents_h_centered
                     new_t_uniform, new_cents_uniform = resample_to_uniform_time(t_h, cents_adjusted, new_sr=100)
                     if new_t_uniform is None:
                         print(
