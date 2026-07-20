@@ -25,37 +25,47 @@ def frequency_to_note_name(freq, ref_hz=440.0):
 
 def sample_entropy(time_series, m=2, r=None, distance='chebyshev'):
     """
-    Computes the Sample Entropy (SampEn) of a time series.
+    Computes the conventional Sample Entropy (SampEn) of a time series.
 
     Parameters:
         time_series (array-like): Input time series data.
         m (int, optional): Length of compared sequences (default: 2).
-        r (float, optional): Tolerance for distance (default: 0.2 * std of series).
-        distance (str, optional): Distance metric ('chebyshev', 'euclidean', 'manhattan'; default: 'chebyshev').
+        r (float, optional): Tolerance for distance
+            (default: 0.2 * standard deviation of the series).
+        distance (str, optional): Distance metric
+            ('chebyshev', 'euclidean', 'manhattan'; default: 'chebyshev').
 
     Returns:
-        float: SampEn value, np.nan if insufficient data, np.inf if no matches.
+        float: SampEn value, np.nan if data are insufficient or non-finite,
+        and np.inf if no valid matches exist.
 
     Notes:
-        - SampEn = -ln(A(m+1) / A(m)), where A(m) is the proportion of vector pairs of length m within r.
-        - Data is not normalized internally; provide normalized input if scale invariance is needed.
-        - Bias correction is applied for small sample sizes using an approximate factor (m+1)/(N-m).
-        - Requires at least m+1 points; returns np.nan if unmet.
+        - SampEn = -ln(A(m+1) / A(m)).
+        - Self-matches are excluded.
+        - No additional multiplicative bias factor is applied.
+        - Data are not normalized internally; provide normalized input when
+          scale invariance is required.
     """
-    time_series = np.asarray(time_series, dtype=np.float64)
+    time_series = np.asarray(time_series, dtype=np.float64).ravel()
     N = len(time_series)
 
     if m < 1:
         raise ValueError("m must be at least 1")
-    if N < m + 1:
-        return np.nan  # Not enough data
+    if N < m + 2:
+        return np.nan
+    if not np.all(np.isfinite(time_series)):
+        return np.nan
 
     if r is None:
-        r = 0.2 * np.std(time_series)
-    if r <= 0:
-        raise ValueError("r must be positive")
+        series_std = np.std(time_series)
+        if series_std == 0:
+            return 0.0
+        r = 0.2 * series_std
 
-        # Define distance function
+    r = float(r)
+    if not np.isfinite(r) or r <= 0:
+        raise ValueError("r must be a positive finite number")
+
     if distance == 'chebyshev':
         dist_func = lambda x, y: np.max(np.abs(x - y), axis=1)
     elif distance == 'euclidean':
@@ -66,27 +76,25 @@ def sample_entropy(time_series, m=2, r=None, distance='chebyshev'):
         raise ValueError(f"Unknown distance metric: {distance}")
 
     def _phi(m_len):
-        patterns = np.array([time_series[i:i + m_len] for i in range(N - m_len + 1)])
+        patterns = np.array(
+            [time_series[i:i + m_len] for i in range(N - m_len + 1)],
+            dtype=np.float64
+        )
         count = 0
         for i in range(len(patterns)):
             dists = dist_func(patterns, patterns[i])
-            count += np.sum(dists <= r) - 1  # exclude self-match
-        denom = (N - m_len + 1) * (N - m_len)
-        return count / denom if denom > 0 else 0
+            count += np.sum(dists <= r) - 1  # Exclude self-match.
+
+        denom = len(patterns) * (len(patterns) - 1)
+        return count / denom if denom > 0 else 0.0
 
     phi_m = _phi(m)
     phi_m1 = _phi(m + 1)
-    print(f"[DEBUG SampEn] phi(m={m}): {phi_m:.6f}")
-    print(f"[DEBUG SampEn] phi(m+1={m + 1}): {phi_m1:.6f}")
 
     if phi_m == 0 or phi_m1 == 0:
         return np.inf
 
-    # Apply bias correction (approximate correction from Lake et al., 2002)
-    correction = (m + 1) / (N - m)  # Simplified bias factor
-    raw_sampen = -np.log(phi_m1 / phi_m)
-    corrected_sampen = raw_sampen * correction
-    return corrected_sampen
+    return float(-np.log(phi_m1 / phi_m))
 
 
 def convert_to_cents(pitch_hz, ref_hz=440.0):
@@ -113,15 +121,57 @@ def remove_mean_or_median(cents_array, use_median=True):
 
 def resample_to_uniform_time(times, values, new_sr=100):
     """
-    Resamples values to a uniform time grid.
+    Resamples values onto an exact uniform time grid.
+
+    The returned grid has a fixed interval of 1 / new_sr seconds. Linear
+    interpolation is used to avoid cubic overshoot that could create artificial
+    extrema in a pitch contour.
     """
-    valid = ~np.isnan(values)
+    times = np.asarray(times, dtype=float).ravel()
+    values = np.asarray(values, dtype=float).ravel()
+
+    if len(times) != len(values):
+        raise ValueError("times and values must have the same length")
+    if not np.isfinite(new_sr) or new_sr <= 0:
+        raise ValueError("new_sr must be a positive finite number")
+
+    valid = np.isfinite(times) & np.isfinite(values)
     if np.sum(valid) < 2:
         return None, None
-    f = interp1d(times[valid], values[valid], kind='cubic', bounds_error=False, fill_value=np.nan)
-    t_min = times[valid].min()
-    t_max = times[valid].max()
-    num_samples = int(np.ceil((t_max - t_min) * new_sr))
-    t_uniform = np.linspace(t_min, t_max, num_samples)
-    v_uniform = f(t_uniform)
+
+    times_valid = times[valid]
+    values_valid = values[valid]
+
+    order = np.argsort(times_valid)
+    times_valid = times_valid[order]
+    values_valid = values_valid[order]
+
+    # interp1d requires strictly increasing time coordinates. When duplicate
+    # times occur, retain the first corresponding value.
+    times_valid, unique_indices = np.unique(times_valid, return_index=True)
+    values_valid = values_valid[unique_indices]
+
+    if len(times_valid) < 2:
+        return None, None
+
+    t_min = float(times_valid[0])
+    t_max = float(times_valid[-1])
+    step = 1.0 / float(new_sr)
+
+    n_steps = int(np.floor((t_max - t_min) / step + 1e-12))
+    if n_steps < 1:
+        return None, None
+
+    t_uniform = t_min + np.arange(n_steps + 1, dtype=float) * step
+
+    interpolator = interp1d(
+        times_valid,
+        values_valid,
+        kind='linear',
+        bounds_error=False,
+        fill_value=np.nan,
+        assume_sorted=True
+    )
+    v_uniform = interpolator(t_uniform)
+
     return t_uniform, v_uniform
