@@ -29,26 +29,156 @@ def load_audio(file_path, sr=22050):
 # PITCH EXTRACTION FUNCTIONS
 ########################################
 
-def extract_pitch_with_praat(wav_path, fmin=50.0, fmax=1500.0, time_step=0.005):
+def _save_pitch_txt(wav_path, times, freqs):
+    """Save a Praat pitch contour next to the source WAV."""
+    out_txt = os.path.splitext(wav_path)[0] + "_pitch_praat.txt"
+    df = pd.DataFrame({
+        "time_s": np.asarray(times, dtype=float),
+        "f0_Hz": np.asarray(freqs, dtype=float),
+    })
+    df.to_csv(out_txt, sep="\t", index=False, header=["time_s", "f0_Hz"])
+    return out_txt
+
+
+def extract_pitch_with_praat(
+    wav_path,
+    fmin=50.0,
+    fmax=1500.0,
+    time_step=0.005,
+    save_txt=True,
+):
     """
-    Uses Praat (via Parselmouth) to extract an autocorrelation-based
-    pitch contour, returns (times, freqs), and writes a TXT alongside the WAV.
+    Use Praat autocorrelation through Parselmouth.
+
+    Native Praat frame times are returned unchanged. They must not be replaced
+    by a linearly stretched 0-duration axis, because that would bias vibrato
+    rate.
     """
     snd = parselmouth.Sound(wav_path)
     pitch_obj = snd.to_pitch_ac(
-        time_step=time_step,
-        pitch_floor=fmin,
-        pitch_ceiling=fmax
+        time_step=float(time_step),
+        pitch_floor=float(fmin),
+        pitch_ceiling=float(fmax),
     )
-    times = pitch_obj.xs()
-    freqs = pitch_obj.selected_array['frequency']
-    out_txt = os.path.splitext(wav_path)[0] + "_pitch_praat.txt"
-    df = pd.DataFrame({
-        "time_s": times,
-        "f0_Hz": freqs
-    })
-    df.to_csv(out_txt, sep="\t", index=False, header=["time_s", "f0_Hz"])
+
+    times = np.asarray(pitch_obj.xs(), dtype=float)
+    freqs = np.asarray(pitch_obj.selected_array["frequency"], dtype=float)
+    freqs[~np.isfinite(freqs) | (freqs <= 0)] = np.nan
+
+    if save_txt:
+        _save_pitch_txt(wav_path, times, freqs)
+
     return times, freqs
+
+
+def extract_pitch_with_praat_adaptive(
+    wav_path,
+    fmin=50.0,
+    fmax=1500.0,
+    time_step=0.005,
+    floor_factor=0.75,
+    min_valid_points=20,
+    return_info=False,
+):
+    """
+    Two-pass Praat extraction for sustained-note vibrato analysis.
+
+    First pass
+    ----------
+    Uses the supplied Fmin/Fmax values to obtain a preliminary contour.
+
+    Second pass
+    -----------
+    Uses a pitch floor equal to 0.75 times the preliminary median F0, while
+    never going below the user-supplied Fmin. This shortens Praat's
+    autocorrelation window and reduces attenuation of fast F0 modulation,
+    improving half-extent recovery.
+
+    Safety
+    ------
+    If the second pass has too few valid frames, the first-pass contour is
+    retained. Native Praat times are preserved in both passes.
+    """
+    fmin = float(fmin)
+    fmax = float(fmax)
+    time_step = float(time_step)
+    floor_factor = float(floor_factor)
+    min_valid_points = int(max(3, min_valid_points))
+
+    times_first, freqs_first = extract_pitch_with_praat(
+        wav_path,
+        fmin=fmin,
+        fmax=fmax,
+        time_step=time_step,
+        save_txt=False,
+    )
+
+    valid_first = freqs_first[np.isfinite(freqs_first) & (freqs_first > 0)]
+    preliminary_median = (
+        float(np.nanmedian(valid_first)) if valid_first.size else np.nan
+    )
+
+    info = {
+        "adaptive_used": False,
+        "preliminary_floor_hz": fmin,
+        "final_floor_hz": fmin,
+        "preliminary_median_f0_hz": preliminary_median,
+    }
+
+    if valid_first.size < min_valid_points or not (0.0 < floor_factor < 1.0):
+        _save_pitch_txt(wav_path, times_first, freqs_first)
+        return (
+            (times_first, freqs_first, info)
+            if return_info
+            else (times_first, freqs_first)
+        )
+
+    adaptive_floor = max(fmin, floor_factor * preliminary_median)
+    adaptive_floor = min(adaptive_floor, 0.90 * fmax)
+
+    if not np.isfinite(adaptive_floor) or adaptive_floor <= fmin * 1.01:
+        _save_pitch_txt(wav_path, times_first, freqs_first)
+        return (
+            (times_first, freqs_first, info)
+            if return_info
+            else (times_first, freqs_first)
+        )
+
+    try:
+        times_second, freqs_second = extract_pitch_with_praat(
+            wav_path,
+            fmin=adaptive_floor,
+            fmax=fmax,
+            time_step=time_step,
+            save_txt=False,
+        )
+
+        valid_second = int(
+            np.sum(np.isfinite(freqs_second) & (freqs_second > 0))
+        )
+        required_second = max(
+            min_valid_points,
+            int(np.ceil(0.50 * valid_first.size)),
+        )
+
+        if valid_second >= required_second:
+            info["adaptive_used"] = True
+            info["final_floor_hz"] = float(adaptive_floor)
+            _save_pitch_txt(wav_path, times_second, freqs_second)
+            return (
+                (times_second, freqs_second, info)
+                if return_info
+                else (times_second, freqs_second)
+            )
+    except Exception:
+        pass
+
+    _save_pitch_txt(wav_path, times_first, freqs_first)
+    return (
+        (times_first, freqs_first, info)
+        if return_info
+        else (times_first, freqs_first)
+    )
 
 
 def extract_pitch_with_yin(audio_data, sr, fmin=50.0, fmax=1500.0, file_path=None):
