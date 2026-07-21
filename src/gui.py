@@ -14,13 +14,13 @@ from tkinter import ttk
 from tkinter import filedialog, messagebox, simpledialog
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 from matplotlib.widgets import SpanSelector
-from pitch import extract_pitch_with_yin, extract_pitch_with_praat, extract_pitch_with_hps, extract_pitch_with_reaper
+from pitch import extract_pitch_with_yin, extract_pitch_with_praat_adaptive, extract_pitch_with_hps, extract_pitch_with_reaper
 
 import sounddevice as sd
 import shutil
 
 # Import from your own modules (without dot!)
-from pitch import load_audio, extract_pitch_with_praat, extract_pitch_with_yin, extract_pitch_with_hps, extract_pitch_with_reaper, extract_pitch_with_sfeeds
+from pitch import load_audio, extract_pitch_with_praat_adaptive, extract_pitch_with_yin, extract_pitch_with_hps, extract_pitch_with_reaper, extract_pitch_with_sfeeds
 from filters import filter_pitch_outliers, apply_bandpass_filter
 from utils import convert_to_cents, remove_mean_or_median, resample_to_uniform_time, sample_entropy
 from spectrogram import plot_spectrogram, plot_before_after_filter, plot_peaks_troughs, final_plot, plot_vibrato_rate
@@ -309,7 +309,7 @@ class VibratoGUI:
             print(f"file_path: {self.file_path}")
 
             if method.lower() == "praat":
-                self.times, self.pitch_hz = extract_pitch_with_praat(self.file_path, fmin=fmin, fmax=fmax)
+                self.times, self.pitch_hz = extract_pitch_with_praat_adaptive(self.file_path, fmin=fmin, fmax=fmax)
             elif method.lower() == "yin":
                 self.times, self.pitch_hz = extract_pitch_with_yin(self.audio_data, self.sr, fmin=fmin, fmax=fmax)
             elif method.lower() == "hps":
@@ -544,7 +544,7 @@ class VibratoGUI:
 
         # Praat
         try:
-            times_praat, f0_praat = extract_pitch_with_praat(file_path, fmin=fmin, fmax=fmax)
+            times_praat, f0_praat = extract_pitch_with_praat_adaptive(file_path, fmin=fmin, fmax=fmax)
             mean_f0_praat = np.nanmean(f0_praat)
             results.append(('Praat', mean_f0_praat))
         except Exception as e:
@@ -587,7 +587,7 @@ class VibratoGUI:
         Updates self.actual_pitch_method to reflect the method used.
         """
         try:
-            times, freqs = extract_pitch_with_praat(wav_path, fmin=float(fmin), fmax=float(fmax))
+            times, freqs = extract_pitch_with_praat_adaptive(wav_path, fmin=float(fmin), fmax=float(fmax))
             self.actual_pitch_method.set("praat")
             print("Pitch extracted with Praat successfully.")
             messagebox.showinfo("Pitch Extraction", "Pitch extracted with Praat successfully.")
@@ -739,7 +739,7 @@ class VibratoGUI:
 
             method = self.pitch_method.get()
             if method.lower() == "praat":
-                self.times, self.pitch_hz = extract_pitch_with_praat(self.file_path, fmin=fmin, fmax=fmax)
+                self.times, self.pitch_hz = extract_pitch_with_praat_adaptive(self.file_path, fmin=fmin, fmax=fmax)
             elif method.lower() == "yin":
                 self.times, self.pitch_hz = extract_pitch_with_yin(self.audio_data, self.sr, fmin=fmin, fmax=fmax)
             elif method.lower() == "hps":
@@ -1309,7 +1309,7 @@ class VibratoGUI:
                 # Extract pitch based on the selected method
                 if selected_method.lower() == "praat":
                     try:
-                        self.times, self.pitch_hz = extract_pitch_with_praat(file_path, fmin=fmin, fmax=fmax)
+                        self.times, self.pitch_hz = extract_pitch_with_praat_adaptive(file_path, fmin=fmin, fmax=fmax)
                         self.actual_pitch_method.set("praat")
                         print(f"Batch: Pitch extracted with Praat for {os.path.basename(file_path)}")
                     except Exception as e:
